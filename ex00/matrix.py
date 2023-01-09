@@ -4,7 +4,7 @@ class Matrice(object):
             self.matrice = data
         elif isinstance(data, tuple):
             self.matrice = self.fill_zero(data)
-        self.shape = self.shape(self.matrice)
+        self.s = self.shape(self.matrice)
     
     def fill_zero(self, data):
         l = [[0]*data[1] for i in range(data[0])]
@@ -31,60 +31,83 @@ class Matrice(object):
     
     def __add__(self, matrice):
         m = matrice.matrice
-        if (self.shape != matrice.shape):
+        print(self.s, matrice.s)
+        if (self.s != matrice.s):
             print("Not the same shape")
             exit(1)
         r = [[round(self.matrice[j][i] + m[j][i], 9) for i in range(0, len(self.matrice[0]))] for j in range(0, len(self.matrice))]
-        return Matrice(r)
+        if (isinstance(self, Vector)):
+            return Vector(r)
+        if (isinstance(self, Matrice)):
+            return Matrice(r)
     
     def __radd__(self, matrice):
         m = matrice.matrice
-        if (self.shape != matrice.shape):
+        if (self.s != matrice.s):
             print("Not the same shape")
             exit(1)
         r = [[round(m[j][i] + self.matrice[j][i], 9) for i in range(0, len(self.matrice[0]))] for j in range(0, len(self.matrice))]
-        return Matrice(r)
+        if (isinstance(self, Vector)):
+            return Vector(r)
+        if (isinstance(self, Matrice)):
+            return Matrice(r)
     
     def __sub__(self, matrice):
         m = matrice.matrice
-        if (self.shape != matrice.shape):
+        if (self.s != matrice.s):
             print("Not the same shape")
             exit(1)
         r = [[round(self.matrice[j][i] - m[j][i], 9) for i in range(0, len(self.matrice[0]))] for j in range(0, len(self.matrice))]
-        return Matrice(r)
+        if (isinstance(self, Vector)):
+            return Vector(r)
+        if (isinstance(self, Matrice)):
+            return Matrice(r)
 
     def __rsub__(self, matrice):
         m = matrice.matrice
-        if (self.shape != matrice.shape):
+        if (self.s != matrice.s):
             print("Not the same shape")
             exit(1)
         r = [[round(m[j][i] - self.matrice[j][i], 9) for i in range(0, len(self.matrice[0]))] for j in range(0, len(self.matrice))]
-        return Matrice(r)
+        if (isinstance(self, Vector)):
+            return Vector(r)
+        if (isinstance(self, Matrice)):
+            return Matrice(r)
     
     def __truediv__(self, scalar):
         if (scalar == 0):
             print("Divide by 0 impossible")
             exit(1)
         r = [[round(self.matrice[j][i] / scalar, 9) for i in range(0, len(self.matrice[0]))] for j in range(0, len(self.matrice))]
-        return Matrice(r)
+        if (isinstance(self, Vector)):
+            return Vector(r)
+        if (isinstance(self, Matrice)):
+            return Matrice(r)
 
     def __rtruediv__(self, scalar):
         if (scalar == 0):
             print("Divide by 0 impossible")
             exit(1)
         r = [[round(self.matrice[j][i] / scalar, 9) for i in range(0, len(self.matrice[0]))] for j in range(0, len(self.matrice))]
-        return Matrice(r)
+        if (isinstance(self, Vector)):
+            return Vector(r)
+        if (isinstance(self, Matrice)):
+            return Matrice(r)
     
     def __mul__(self, scalar):
-        if (isinstance(scalar, int), isinstance(scalar, float)):
+        if (isinstance(scalar, int) or isinstance(scalar, float)):
             r = [[round(self.matrice[j][i] * scalar, 9) for i in range(0, len(self.matrice[0]))] for j in range(0, len(self.matrice))]
-        if (isinstance(scalar, Matrice)):
+        else:
+            if (self.s[2] != scalar.s[0]):
+                print("Mul impossible")
+                exit(0)
             mat = scalar.matrice
             r = []
             i = 0
             k = 0
             for c in self.matrice:
-                empty = [0 for i in range(0, len(self.matrice[0]))]
+                empty = [0 for i in range(0, int(scalar.s[2]))]
+                print(empty)
                 for m in mat:
                     for n in m:
                         empty[i] = empty[i] + c[k]*n
@@ -93,7 +116,8 @@ class Matrice(object):
                     k = k + 1
                 r.append(empty)
                 k = 0
-        return Matrice(r)
+        if (isinstance(self, Matrice)):
+            return Matrice(r)
 
     def T(self):
         m = self.matrice
@@ -116,15 +140,31 @@ class Vector(Matrice):
                 if len(column[i]) != 1:
                     print("Error: that's not the syntax of a Vector")
                     exit(1)
+        self.matrice = column
+        self.s = self.shape(column)
 
-    
+    def mul_vec(self, vec):
+        new = []
+        if len(vec.vector) != len(self.matrice):
+            print("Error: not the same shape")
+            exit(1)
+        i = 0
+        r = 0
+        for m in self.matrice:
+            for n in m:
+                r = r + n*vec.vector[i]
+                i = i + 1
+            new.append(r)
+            r = 0
+            i = 0
+        return Vector(new)   
     """
     def print(self):
         p = [[m for m in matrice] for matrice in self.matrice]
         print(p)
     
 
-    def reshape(self):
+    def res(self):
         m = [val for matrice in self.matrice for val in matrice]
         return Vector(m)
     
@@ -153,7 +193,7 @@ class Vector(Matrice):
     def mul_vec(self, vec):
         new = []
         if len(vec.vector) != len(self.matrice):
-            print("Error: not the same size")
+            print("Error: not the same shapeize")
             exit(1)
         i = 0
         r = 0
