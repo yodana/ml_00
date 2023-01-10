@@ -107,7 +107,6 @@ class Matrice(object):
             k = 0
             for c in self.matrice:
                 empty = [0 for i in range(0, int(scalar.s[2]))]
-                print(empty)
                 for m in mat:
                     for n in m:
                         empty[i] = empty[i] + c[k]*n
@@ -116,6 +115,8 @@ class Matrice(object):
                     k = k + 1
                 r.append(empty)
                 k = 0
+        if (isinstance(self, Vector)):
+            return Vector(r)
         if (isinstance(self, Matrice)):
             return Matrice(r)
 
